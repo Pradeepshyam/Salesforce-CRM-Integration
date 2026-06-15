@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
+	<http:listener-config name="HTTP_Listener_config" doc:name="HTTP Listener config" doc:id="7889d952-3d02-4790-ac91-a6a76120e922" >
+		<http:listener-connection host="0.0.0.0" port="8081" />
+	</http:listener-config>
+	<flow name="currency-system-apiFlow" doc:id="6e40c9ee-0f85-4a0a-a978-cccacf7bac99" >
+		<http:listener doc:name="Listener" doc:id="44e681ce-4369-4604-b6da-8fbfd8b96ee1" config-ref="HTTP_Listener_config" path="/currency/rate" allowedMethods="GET"/>
+		<http:request doc:name="Request" doc:id="43a4f615-03b6-4171-b2cb-6bc950b54090" url="https://api.frankfurter.app/latest?from=EUR&amp;to=USD"/>
+	</flow>
+</mule>

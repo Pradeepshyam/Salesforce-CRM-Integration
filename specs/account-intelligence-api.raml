@@ -1,0 +1,89 @@
+#%RAML 1.0
+title: Account Intelligence API
+version: 1.0.0
+baseUri: https://grivera-experience-api-wczga1.5sc6y6-1.usa-e2.cloudhub.io/api
+
+types:
+  AccountProfile:
+    type: object
+    properties:
+      account:
+        type: object
+        properties:
+          name: string
+          industry: string
+          supportTier: string
+          csm: string
+          renewalDate: string
+      opportunity:
+        type: object
+        properties:
+          name: string
+          stage: string
+          amount: number
+          currency: string
+          closeDate: string
+      orders:
+        type: array
+        items:
+          type: object
+          properties:
+            orderId: string
+            orderDate: string
+            productLine: string
+            totalValueUSD: number
+            fulfillmentStatus: string
+            invoiceStatus: string
+      currencyRate:
+        type: object
+        properties:
+          from: string
+          to: string
+          rate: number
+      summary:
+        type: object
+        properties:
+          totalOrders: integer
+          totalRevenueUSD: number
+
+/account:
+  /{name}:
+    uriParameters:
+      name:
+        type: string
+        description: The account name to look up
+        example: Acme Corp
+    get:
+      description: Returns a unified account intelligence profile by aggregating data from Salesforce CRM, ERP order history, and live currency exchange rates.
+      responses:
+        200:
+          body:
+            application/json:
+              type: AccountProfile
+              example:
+                account:
+                  name: Acme Corp
+                  industry: Technology
+                  supportTier: Enterprise
+                  csm: Sarah Johnson
+                  renewalDate: "2026-09-01"
+                opportunity:
+                  name: Acme Corp - 2026 Renewal
+                  stage: Negotiation/Review
+                  amount: 130000
+                  currency: EUR
+                  closeDate: "2026-08-15"
+                orders:
+                  - orderId: ORD-2025-00892
+                    orderDate: "2025-11-15"
+                    productLine: Platform License - Enterprise + Professional Services
+                    totalValueUSD: 118000
+                    fulfillmentStatus: Delivered
+                    invoiceStatus: Paid
+                currencyRate:
+                  from: EUR
+                  to: USD
+                  rate: 1.18
+                summary:
+                  totalOrders: 2
+                  totalRevenueUSD: 223000

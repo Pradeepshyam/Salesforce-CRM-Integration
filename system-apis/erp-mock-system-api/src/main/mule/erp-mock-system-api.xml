@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
+	<http:listener-config name="HTTP_Listener_config" doc:name="HTTP Listener config" doc:id="3ab166c6-27a2-44fd-ae0b-af94925210fe" >
+		<http:listener-connection host="0.0.0.0" port="8081" />
+	</http:listener-config>
+	<flow name="erp-mock-system-apiFlow" doc:id="8f214875-d9e7-45e6-abb0-1f183c26c98d" >
+		<http:listener doc:name="Listener" doc:id="abc01b99-9991-4b17-8d34-0db0dcef440c" config-ref="HTTP_Listener_config" path="/erp/orders/{accountName}"/>
+		<choice doc:name="Choice" doc:id="8a072030-b2ef-4659-a611-9fba39cc57b1" >
+			<when expression='#[attributes.uriParams.accountName == "Acme Corp"]'>
+				<set-payload value='{"source":"erp-mock","simulatedSystem":"SAP S/4HANA","account":"Acme Corp","orders":[{"orderId":"ORD-2025-00892","orderDate":"2025-11-10","products":["Platform License - Enterprise","Professional Services"],"totalValueUSD":118000,"fulfillmentStatus":"Fulfilled","invoiceStatus":"Paid"},{"orderId":"ORD-2024-00541","orderDate":"2024-11-08","products":["Platform License - Enterprise"],"totalValueUSD":105000,"fulfillmentStatus":"Fulfilled","invoiceStatus":"Paid"}]}' doc:name="Set Payload" doc:id="972bd112-b404-4e75-80ae-8f22a6283ac9" mimeType="application/json" />
+			</when>
+			<when expression='#[attributes.uriParams.accountName == "Globex Industries"]'>
+				<set-payload value='{"source":"erp-mock","simulatedSystem":"SAP S/4HANA","account":"Globex Industries","orders":[]}' doc:name="Set Payload" doc:id="00c3dccd-0966-4435-b5a2-ee364c1ac93c" mimeType="application/json" />
+			</when>
+			<when expression='#[attributes.uriParams.accountName == "Initech Systems"]'>
+				<set-payload value='{"source":"erp-mock","simulatedSystem":"SAP S/4HANA","account":"Initech Systems","orders":[{"orderId":"ORD-2025-01204","orderDate":"2025-12-15","products":["Platform License - Enterprise","Data Analytics Add-On"],"totalValueUSD":195000,"fulfillmentStatus":"Fulfilled","invoiceStatus":"Outstanding"},{"orderId":"ORD-2025-00310","orderDate":"2025-03-22","products":["Platform License - Enterprise"],"totalValueUSD":160000,"fulfillmentStatus":"Fulfilled","invoiceStatus":"Paid"}]}' doc:name="Set Payload" doc:id="28542f3d-548e-4214-83d3-aa99e051d68b" mimeType="application/json" />
+			</when>
+			<when expression='#[attributes.uriParams.accountName == "Umbrella Ltd"]'>
+				<set-payload value='{"source":"erp-mock","simulatedSystem":"SAP S/4HANA","account":"Umbrella Ltd","orders":[{"orderId":"ORD-2025-00678","orderDate":"2025-08-05","products":["Platform License - Standard"],"totalValueUSD":52000,"fulfillmentStatus":"Fulfilled","invoiceStatus":"Paid"}]}' doc:name="Set Payload" doc:id="21ab52fd-13d8-4eed-9a5e-5a65d85b704a" mimeType="application/json" />
+			</when>
+			<otherwise >
+				<set-payload value='{"error":"Account not found","simulatedSystem":"SAP S/4HANA"}' doc:name="Set Payload" doc:id="3c04bcce-1784-4063-bf21-a2d90df00996" mimeType="application/json" />
+			</otherwise>
+		</choice>
+	</flow>
+</mule>

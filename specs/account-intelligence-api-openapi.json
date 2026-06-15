@@ -1,0 +1,103 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "Account Intelligence API",
+    "version": "1.0.0",
+    "description": "Unified account intelligence profile aggregating Salesforce CRM, ERP order history, and live currency exchange rates. This OpenAPI 3.0 spec was manually translated from the RAML specification for Salesforce External Service compatibility."
+  },
+  "servers": [
+    {
+      "url": "https://grivera-experience-api-wczga1.5sc6y6-1.usa-e2.cloudhub.io/api"
+    }
+  ],
+  "paths": {
+    "/account/{name}": {
+      "get": {
+        "operationId": "getAccount",
+        "summary": "Get unified account intelligence profile",
+        "description": "Returns aggregated account data from Salesforce, ERP, and currency APIs",
+        "parameters": [
+          {
+            "name": "name",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The account name to look up"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Account intelligence profile",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AccountProfile"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "AccountProfile": {
+        "type": "object",
+        "properties": {
+          "account": {
+            "type": "object",
+            "properties": {
+              "name": { "type": "string" },
+              "industry": { "type": "string" },
+              "supportTier": { "type": "string" },
+              "csm": { "type": "string" },
+              "renewalDate": { "type": "string" }
+            }
+          },
+          "opportunity": {
+            "type": "object",
+            "properties": {
+              "name": { "type": "string" },
+              "stage": { "type": "string" },
+              "amount": { "type": "number" },
+              "currency": { "type": "string" },
+              "closeDate": { "type": "string" }
+            }
+          },
+          "orders": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "orderId": { "type": "string" },
+                "orderDate": { "type": "string" },
+                "productLine": { "type": "string" },
+                "totalValueUSD": { "type": "number" },
+                "fulfillmentStatus": { "type": "string" },
+                "invoiceStatus": { "type": "string" }
+              }
+            }
+          },
+          "currencyRate": {
+            "type": "object",
+            "properties": {
+              "from": { "type": "string" },
+              "to": { "type": "string" },
+              "rate": { "type": "number" }
+            }
+          },
+          "summary": {
+            "type": "object",
+            "properties": {
+              "totalOrders": { "type": "integer" },
+              "totalRevenueUSD": { "type": "number" }
+            }
+          }
+        }
+      }
+    }
+  }
+}

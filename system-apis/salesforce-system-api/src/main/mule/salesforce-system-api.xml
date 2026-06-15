@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:salesforce="http://www.mulesoft.org/schema/mule/salesforce"
+	xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/salesforce http://www.mulesoft.org/schema/mule/salesforce/current/mule-salesforce.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+	<http:listener-config name="HTTP_Listener_config" doc:name="HTTP Listener config" doc:id="a0ead114-dc16-422a-9ff3-89fd8133b33c" >
+		<http:listener-connection host="0.0.0.0" port="8081" />
+	</http:listener-config>
+	<salesforce:sfdc-config name="Salesforce_Config" doc:name="Salesforce Config" doc:id="67978d6c-982b-4f82-9971-03731a7d221b" >
+		<salesforce:oauth-client-credentials-connection >
+			<salesforce:oauth-client-credentials clientId="${salesforce.clientId}" clientSecret="${salesforce.clientSecret}" tokenUrl="${salesforce.tokenUrl}" />
+		</salesforce:oauth-client-credentials-connection>
+	</salesforce:sfdc-config>
+	<flow name="salesforce-system-apiFlow" doc:id="2b7c669a-e609-473e-bcec-6b4e393105ca" >
+		<http:listener doc:name="Listener" doc:id="46f4ac47-362e-431b-b88b-1217800a7808" config-ref="HTTP_Listener_config" path="/salesforce/account/{name}"/>
+		<salesforce:query doc:name="Query" doc:id="f825bbd1-8a2b-421c-b48c-635b8a493daa" config-ref="Salesforce_Config">
+			<salesforce:salesforce-query ><![CDATA[SELECT Id, Name, Industry, Support_Tier__c, CSM__c, Contract_Renewal_Date__c FROM Account WHERE Name = ':name']]></salesforce:salesforce-query>
+			<salesforce:parameters ><![CDATA[#[output application/java
+---
+{
+	name : attributes.uriParams.name
+}]]]></salesforce:parameters>
+		</salesforce:query>
+		<set-variable value="#[payload[0]]" doc:name="Set Variable" doc:id="04c765d1-3f0a-4bde-b2b9-bc8c4ec92fdb" variableName="account"/>
+		<salesforce:query doc:name="Query" doc:id="70e2d562-a6b4-4044-9b63-0f8bb315a105" config-ref="Salesforce_Config">
+			<salesforce:salesforce-query ><![CDATA[SELECT Id, Name, StageName, Amount, CloseDate, CurrencyIsoCode FROM Opportunity WHERE AccountId = ':accountId' ORDER BY CreatedDate DESC LIMIT 1
+]]></salesforce:salesforce-query>
+			<salesforce:parameters ><![CDATA[#[output application/java
+---
+{
+	accountId : vars.account.Id
+}]]]></salesforce:parameters>
+		</salesforce:query>
+		<ee:transform doc:name="Transform Message" doc:id="ce346e8a-e611-4a01-8814-756b5a063876">
+			<ee:message>
+				<ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{
+  source: "salesforce",
+  account: {
+    name: vars.account.Name,
+    industry: vars.account.Industry,
+    supportTier: vars.account.Support_Tier__c,
+    renewalDate: vars.account.Contract_Renewal_Date__c as String default "",
+    csm: vars.account.CSM__c
+  },
+  opportunity: {
+    name: payload[0].Name default null,
+    stage: payload[0].StageName default null,
+    valueEUR: payload[0].Amount default null,
+    closeDate: payload[0].CloseDate as String default null
+  }
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+	</flow>
+</mule>
