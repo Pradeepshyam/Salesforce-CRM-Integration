@@ -4,7 +4,7 @@ A 3-tier API-led integration connecting **Salesforce CRM**, **live currency exch
 
 Built to demonstrate MuleSoft API-led connectivity patterns with Salesforce integration.
 
-> **Live demo:** [amblingtree.com/projects/mulesoft-demo](https://www.amblingtree.com/projects/mulesoft-demo) — ask the chat about any demo company to pull live data through the full pipeline.
+
 
 ---
 
@@ -137,6 +137,3 @@ Each API directory contains the Mule XML configuration (`src/main/mule/`) and Ma
 
 ---
 
-## Live Demo
-
-The chat at [amblingtree.com/projects/mulesoft-demo](https://www.amblingtree.com/projects/mulesoft-demo) calls the same MuleSoft API pipeline. Claude AI acts as the agent (mirroring Agentforce's role inside Salesforce), deciding when to call the Experience API via tool use. The MuleSoft pipeline is identical in both paths.
